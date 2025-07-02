@@ -53,9 +53,7 @@ if (!$connection) {
 
 mysqli_set_charset($connection, "utf8mb4");
 🔁 FUNCIONES BÁSICAS
-php
-Copiar
-Editar
+
 function ejecutarConsulta($query, $connection) {
    $result = mysqli_query($connection, $query);
    if (!$result) return false;
@@ -87,8 +85,6 @@ function respuestaError($message = 'Error', $code = 400) {
 }
 🔄 INTEGRACIÓN AJAX (Frontend jQuery)
 js
-Copiar
-Editar
 $.ajax({
    url: 'server/controlador_citas.php',
    type: 'POST',
@@ -115,8 +111,6 @@ function renderizarCitas(citas) {
 }
 🧠 BACKEND (/server/controlador_citas.php)
 php
-Copiar
-Editar
 include '../inc/conexion.php';
 header('Content-Type: application/json; charset=utf-8');
 
@@ -168,8 +162,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 🖼️ EJEMPLO BÁSICO EN FRONTEND (citas.php)
 html
-Copiar
-Editar
 <div id="contenedor-citas"></div>
 
 <script>
@@ -195,8 +187,6 @@ function renderizar(citas) {
 </script>
 🧱 TEMPLATE RENDERER (PHP + HTML)
 php
-Copiar
-Editar
 $datos = json_decode($_POST['datos'], true);
 foreach($datos as $item):
 ?>
