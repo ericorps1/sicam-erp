@@ -3,7 +3,7 @@
 # SICAM Standards - PHP 5.6 + MySQL + jQuery + Bootstrap
 
 > 🧠 Estándar de desarrollo para el sistema SICAM  
-> Mantener stack, mejorar estructura, asegurar consistencia en el código legacy.
+> Mantener stack, mejorar estructura, asegurar consistencia
 
 ---
 
@@ -20,29 +20,27 @@
 
 ## 📁 ESTRUCTURA MODULAR
 
-/tabla_usuario/
-├── tabla.php # Frontend
-├── /server/
-│ └── controlador_tabla.php # Controlador MySQL
-└── /inc/
-└── conexion.php # Configuración de BD
+## 📁 ESTRUCTURA MODULAR
 
-shell
-Copiar
-Editar
+| Carpeta / Archivo                    | Descripción                       |
+|-------------------------------------|-----------------------------------|
+| /tabla_usuario/                     | Módulo ejemplo base               |
+| ├── tabla.php                       | Frontend                          |
+| ├── /server/controlador_tabla.php   | Controlador MySQL                 |
+| └── /inc/conexion.php               | Configuración de base de datos    |
 
-### 🧪 Ejemplo aplicado:
+### 🧪 EJEMPLO APLICADO:
 
-/ejecutivo/
-├── citas.php
-├── /server/
-│ └── controlador_citas.php
-└── /inc/
-└── conexion.php
+| Carpeta / Archivo                    | Descripción                       |
+|-------------------------------------|-----------------------------------|
+| /ejecutivo/                         | Módulo real de citas              |
+| ├── citas.php                       | Frontend                          |
+| ├── /server/controlador_citas.php   | Controlador de citas              |
+| └── /inc/conexion.php               | Configuración BD                  |
 
-php
-Copiar
-Editar
+> ⚠️ **Nota:** Todos los archivos van en **plural** (ej: `controlador_citas.php`)
+
+
 
 > ⚠️ **Nota:** Todos los archivos van en **plural** (ej: `controlador_citas.php`)
 
