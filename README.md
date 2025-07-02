@@ -38,9 +38,12 @@
 
 ---
 
-## 🔌 CONEXIÓN Y CONFIGURACIÓN BASE (`/inc/conexion.php`)
+## 🔌 CONEXIÓN Y CONFIGURACIÓN BASE
+
+### Archivo: `/inc/conexion.php`
 
 ```php
+<?php
 $host = "localhost";
 $user = "sicam_user"; 
 $pass = "sicam_pass";
@@ -52,8 +55,16 @@ if (!$connection) {
 }
 
 mysqli_set_charset($connection, "utf8mb4");
-🔁 FUNCIONES BÁSICAS
+?>
+```
 
+---
+
+## 🔁 FUNCIONES BÁSICAS
+
+```php
+<?php
+// Función para ejecutar consultas y obtener datos
 function ejecutarConsulta($query, $connection) {
    $result = mysqli_query($connection, $query);
    if (!$result) return false;
@@ -64,10 +75,12 @@ function ejecutarConsulta($query, $connection) {
    return $datos;
 }
 
+// Función para escape de datos (prevención SQL Injection)
 function escape($valor, $connection) {
     return mysqli_real_escape_string($connection, $valor);
 }
 
+// Respuesta exitosa estándar
 function respuestaExito($data = null, $message = 'OK') {
     return json_encode([
         'success' => true,
@@ -76,6 +89,7 @@ function respuestaExito($data = null, $message = 'OK') {
     ], JSON_UNESCAPED_UNICODE);
 }
 
+// Respuesta de error estándar
 function respuestaError($message = 'Error', $code = 400) {
     return json_encode([
         'success' => false,
@@ -83,8 +97,15 @@ function respuestaError($message = 'Error', $code = 400) {
         'code' => $code
     ], JSON_UNESCAPED_UNICODE);
 }
-🔄 INTEGRACIÓN AJAX (Frontend jQuery)
-js
+?>
+```
+
+---
+
+## 🔄 INTEGRACIÓN AJAX (Frontend jQuery)
+
+```javascript
+// Llamada AJAX estándar
 $.ajax({
    url: 'server/controlador_citas.php',
    type: 'POST',
@@ -102,6 +123,7 @@ $.ajax({
    }
 });
 
+// Función para renderizar datos
 function renderizarCitas(citas) {
     var html = '';
     citas.forEach(function(cita) {
@@ -109,9 +131,16 @@ function renderizarCitas(citas) {
     });
     $('#contenedor-citas').html(html);
 }
+```
 
-BACKEND (/server/controlador_citas.php)
+---
 
+## 🔧 BACKEND - CONTROLADOR
+
+### Archivo: `/server/controlador_citas.php`
+
+```php
+<?php
 include '../inc/conexion.php';
 header('Content-Type: application/json; charset=utf-8');
 
@@ -161,8 +190,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     mysqli_close($connection);
     exit;
 }
-🖼️ EJEMPLO BÁSICO EN FRONTEND (citas.php)
-html
+?>
+```
+
+---
+
+## 🖼️ EJEMPLO BÁSICO EN FRONTEND
+
+### Archivo: `citas.php`
+
+```html
 <div id="contenedor-citas"></div>
 
 <script>
@@ -186,27 +223,30 @@ function renderizar(citas) {
     $('#contenedor-citas').html(html);
 }
 </script>
-🧱 TEMPLATE RENDERER (PHP + HTML)
+```
 
+---
+
+## 🧱 TEMPLATE RENDERER (PHP + HTML)
+
+```php
+<?php
 $datos = json_decode($_POST['datos'], true);
 foreach($datos as $item):
 ?>
     <div><?= $item['nom_cit'] ?> - <?= $item['tel_cit'] ?></div>
 <?php endforeach; ?>
-📌 NOTAS IMPORTANTES
-✅ Header Content-Type con charset=utf-8 en controladores
+```
 
-✅ Controlador devuelve JSON con array estructurado
+---
 
-✅ response.data es un array de objetos
+## 📌 NOTAS IMPORTANTES
 
-✅ escape() obligatorio para prevenir SQL Injection
-
-✅ Funciones pequeñas (máximo 20-30 líneas)
-
-✅ Separar lógica de presentación
-
-✅ Mostrar query en errores para debugging
-
-✅ Vibecodear moderadamente 🚀
-
+- ✅ Header `Content-Type` con `charset=utf-8` en controladores
+- ✅ Controlador devuelve JSON con array estructurado
+- ✅ `response.data` es un array de objetos
+- ✅ `escape()` obligatorio para prevenir SQL Injection
+- ✅ Funciones pequeñas (máximo 20-30 líneas)
+- ✅ Separar lógica de presentación
+- ✅ Mostrar query en errores para debugging
+- ✅ Vibecodear moderadamente 🚀
