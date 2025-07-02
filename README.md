@@ -109,8 +109,9 @@ function renderizarCitas(citas) {
     });
     $('#contenedor-citas').html(html);
 }
-🧠 BACKEND (/server/controlador_citas.php)
-php
+
+BACKEND (/server/controlador_citas.php)
+
 include '../inc/conexion.php';
 header('Content-Type: application/json; charset=utf-8');
 
@@ -186,7 +187,7 @@ function renderizar(citas) {
 }
 </script>
 🧱 TEMPLATE RENDERER (PHP + HTML)
-php
+
 $datos = json_decode($_POST['datos'], true);
 foreach($datos as $item):
 ?>
