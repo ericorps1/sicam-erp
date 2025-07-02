@@ -1,7 +1,7 @@
 # SICAM Standards - PHP 5.6 + MySQL + jQuery + Bootstrap
 
-> 🧠 Estándar de desarrollo para ERP SICAM  
-> Mantener stack, mejorar estructura, asegurar consistencia en el código legacy.
+> Estándar de desarrollo para ERP SICAM  
+> Mantener stack, mejorar estructura, asegurar consistencia.
 
 ---
 
