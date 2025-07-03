@@ -1,6 +1,6 @@
 # SICAM Standards - PHP 5.6 + MySQL + jQuery + Bootstrap
 
-> Estándar de desarrollo para ERP SICAM  
+> 🧠 Estándar de desarrollo para ERP SICAM  
 > Mantener stack, mejorar estructura, asegurar consistencia.
 
 ---
@@ -237,6 +237,132 @@ foreach($datos as $item):
 	<div><?= $item['nom_cit'] ?> - <?= $item['tel_cit'] ?></div>
 <?php endforeach; ?>
 ```
+
+---
+
+## 📊 HANDSONTABLE PARA CRUDS
+
+ERP SICAM utiliza **Handsontable** para casi todos los CRUD de los módulos.
+
+### 🔗 Referencia oficial:
+- **Documentación:** https://handsontable.com/demo
+- **Incorporación:** Manual (descarga de archivos CSS/JS)
+- **Uso:** Tablas editables con integración AJAX
+
+### 💡 Implementación básica:
+```html
+<!-- Dependencias manuales -->
+<link rel="stylesheet" href="handsontable/handsontable.full.min.css">
+<script src="handsontable/handsontable.full.min.js"></script>
+
+<!-- Contenedor -->
+<div id="tabla-citas"></div>
+
+<script>
+// Inicialización de Handsontable para citas
+var hot = new Handsontable(document.getElementById('tabla-citas'), {
+	data: datos,  // Array bidimensional con los datos de citas
+	colHeaders: ['ID', 'NOMBRE', 'TELÉFONO', 'EJECUTIVO'],  // Títulos de columnas de cita
+	columns: [
+		{ type: 'text', readOnly: true },  // ID de cita (solo lectura)
+		{ type: 'text' },  // Nombre de la cita
+		{ type: 'text' },  // Teléfono de la cita
+		{ type: 'dropdown', source: ['Ejecutivo 1', 'Ejecutivo 2'] }  // Dropdown de ejecutivos
+	],
+	// Evento que se dispara cuando cambia una celda
+	afterChange: function(changes, source) {
+		// Evitar procesar cambios cuando se carga data inicial
+		if (changes && source !== 'loadData') {
+			// Recorrer todos los cambios realizados
+			changes.forEach(([row, prop, oldValue, newValue]) => {
+				// Llamar función para guardar cada cambio
+				guardarCambio(row, prop, newValue);
+			});
+		}
+	}
+});
+
+// Función para guardar cambios via AJAX
+function guardarCambio(row, column, value) {
+	// Patrón Column-to-Field Mapping para mapear índice de columna a campo BD
+	var campo = obtenerCampo(column);  // Obtener nombre del campo de BD
+	var id = hot.getDataAtCell(row, 0);  // Obtener ID de la cita (columna 0)
+	
+	// Llamada AJAX para guardar cambio en cita
+	$.ajax({
+		url: 'server/controlador_citas.php',  // Endpoint del controlador de citas
+		type: 'POST',  // Método HTTP
+		data: {
+			action: 'actualizar_cita',  // Acción a realizar
+			campo: campo,  // Campo de BD a actualizar
+			valor: value,  // Nuevo valor
+			id_cit: id  // ID de la cita
+		},
+		dataType: 'json',  // Esperamos respuesta JSON
+		success: function(response) {
+			// Manejar respuesta exitosa
+			if(response.success) {
+				console.log('Cita actualizada');
+			} else {
+				alert('Error: ' + response.message);
+			}
+		}
+	});
+}
+
+// Función para mapear columna a campo de BD (implementar según necesidades)
+function obtenerCampo(column) {
+	// Mapeo de índice de columna a nombre de campo en tabla cita
+	var campos = {
+		0: 'id_cit',  // Columna 0 = campo id_cit
+		1: 'nom_cit',  // Columna 1 = campo nom_cit (nombre)
+		2: 'tel_cit',  // Columna 2 = campo tel_cit (teléfono)
+		3: 'id_eje2'   // Columna 3 = campo id_eje2 (ejecutivo)
+	};
+	return campos[column];  // Retornar el campo correspondiente
+}
+</script>
+```
+
+### 🔧 Backend para Handsontable:
+
+```php
+<?php
+// Archivo: server/controlador_citas.php
+include '../inc/conexion.php';
+header('Content-Type: application/json; charset=utf-8');
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+	
+	$action = escape($_POST['action'], $connection);
+	
+	switch($action) {
+		
+		case 'actualizar_cita':
+			$campo = escape($_POST['campo'], $connection);
+			$valor = escape($_POST['valor'], $connection);
+			$id_cit = escape($_POST['id_cit'], $connection);
+			
+			// Patrón Field-Value dinámico para UPDATE
+			$query = "UPDATE cita SET $campo = '$valor' WHERE id_cit = '$id_cit'";
+			
+			if(mysqli_query($connection, $query)) {
+				echo respuestaExito(null, 'Campo actualizado correctamente');
+			} else {
+				echo respuestaError('Error al actualizar: ' . mysqli_error($connection) . ' Query: ' . $query);
+			}
+		break;
+		
+		// Otros casos del controlador...
+	}
+	
+	mysqli_close($connection);
+	exit;
+}
+?>
+```
+
+> **Nota:** La implementación específica y mapeo de campos queda a criterio del desarrollador según las necesidades del módulo.
 
 ---
 
