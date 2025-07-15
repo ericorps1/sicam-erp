@@ -365,6 +365,495 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 > **Nota:** La implementación específica y mapeo de campos queda a criterio del desarrollador según las necesidades del módulo.
 
 ---
+# 🔌 WebSocket para SICAM - Guía Completa
+
+**Servidor WebSocket disponible:** `wss://socket.ahjende.com/wss/?encoding=text`
+
+## 🎯 **¿Qué es WebSocket?**
+
+Imagina un **teléfono** entre todos los navegadores conectados. Cuando alguien habla, todos escuchan **instantáneamente**.
+
+```
+                Usuario C
+                    ↑
+    Usuario A ← WebSocket → Usuario B  
+                    ↓
+                Usuario D
+```
+
+**Ventaja vs AJAX**: No necesitas preguntar "¿hay algo nuevo?" cada segundo. El servidor te avisa automáticamente.
+
+---
+
+## 🏗️ **Las 4 Funcionalidades Básicas**
+
+### 1. **`onopen`** - Conexión establecida
+```javascript
+socket.onopen = () => console.log('✅ Conectado');
+```
+
+### 2. **`onmessage`** - Recibir datos
+```javascript
+socket.onmessage = (event) => console.log('📨 Recibido:', event.data);
+```
+
+### 3. **`onclose`** - Conexión cerrada
+```javascript
+socket.onclose = () => console.log('🔴 Desconectado');
+```
+
+### 4. **`onerror`** - Error en conexión
+```javascript
+socket.onerror = (error) => console.error('❌ Error:', error);
+```
+
+### **`send()`** - Enviar datos
+```javascript
+socket.send(JSON.stringify({ mensaje: 'Hola' }));
+```
+
+---
+
+## 🚀 **Implementación SICAM**
+
+### **Servidor WebSocket ya existe:**
+```
+wss://socket.ahjende.com/wss/?encoding=text
+```
+
+**Solo necesitas frontend JavaScript.** El servidor está listo.
+
+---
+
+## 🧪 **Ejemplo 1: Prueba Básica**
+
+**¿Qué hace?** Conecta al WebSocket y permite enviar mensajes de prueba. Al hacer clic en "Enviar", todas las pestañas abiertas ven el mismo mensaje.
+
+```html
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Test WebSocket Simple</h1>
+    <button onclick="enviar()">Enviar</button>
+    <div id="log"></div>
+
+    <script>
+        const socket = new WebSocket('wss://socket.ahjende.com/wss/?encoding=text');
+        
+        socket.onopen = () => {
+            document.getElementById('log').innerHTML += '<p>✅ Conectado</p>';
+        };
+        
+        socket.onmessage = (event) => {
+            document.getElementById('log').innerHTML += '<p>📨 ' + event.data + '</p>';
+        };
+        
+        function enviar() {
+            socket.send(JSON.stringify({
+                mensaje: 'Hola desde ' + Math.random()
+            }));
+        }
+    </script>
+</body>
+</html>
+```
+
+**Prueba**: Abre en 2 pestañas, haz clic en una, ve el mensaje en ambas.
+
+---
+
+## 🎯 **Ejemplo 2: WebSocket + Handsontable**
+
+**¿Qué hace?** Simula el sistema de citas real. Cuando editas una celda en una pestaña, el cambio aparece automáticamente en todas las demás pestañas abiertas. Incluye logs para ver exactamente qué mensajes se envían y reciben.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket + Handsontable SICAM</title>
+    <!-- Handsontable CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.5.0/dist/handsontable.full.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@14.5.0/dist/handsontable.full.min.js"></script>
+</head>
+<body>
+    <h1>Test WebSocket + Handsontable</h1>
+    <div id="tabla" style="width: 600px; height: 300px;"></div>
+    <p>Mi ID Ejecutivo: <input id="miId" value="1" style="width: 50px;"> (Cambia a 2 en otra pestaña)</p>
+    <div id="log" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc; height: 200px; overflow-y: scroll;"></div>
+
+    <script>
+        // WebSocket
+        const socket = new WebSocket('wss://socket.ahjende.com/wss/?encoding=text');
+        
+        function log(mensaje) {
+            const time = new Date().toLocaleTimeString();
+            document.getElementById('log').innerHTML += `<p>[${time}] ${mensaje}</p>`;
+            document.getElementById('log').scrollTop = document.getElementById('log').scrollHeight;
+        }
+        
+        // Datos de prueba (simular citas)
+        const datos = [
+            [1, 'Juan Pérez', '555-1234'],
+            [2, 'María García', '555-5678'],
+            [3, 'Carlos López', '555-9999']
+        ];
+        
+        // Handsontable
+        const hot = new Handsontable(document.getElementById('tabla'), {
+            data: datos,
+            colHeaders: ['ID Cita', 'Nombre Cliente', 'Teléfono'],
+            columns: [
+                {readOnly: true}, // ID no editable
+                {type: 'text'},   // Nombre
+                {type: 'text'}    // Teléfono
+            ],
+            licenseKey: 'non-commercial-and-evaluation',
+            
+            afterChange: function(changes, source) {
+                log(`📝 afterChange disparado con source: ${source}`);
+                
+                if (source !== 'loadData' && source !== 'websocket') {
+                    changes.forEach(function([row, col, oldValue, newValue]) {
+                        
+                        const id_cit = hot.getDataAtCell(row, 0);
+                        const campo = col === 1 ? 'nom_cit' : 'tel_cit';
+                        const miId = parseInt(document.getElementById('miId').value);
+                        
+                        // Enviar por WebSocket
+                        const mensaje = {
+                            tipo: 'cita_actualizada',
+                            id_cit: id_cit,
+                            campo: campo,
+                            valor: newValue,
+                            id_ejecutivo: miId
+                        };
+                        
+                        socket.send(JSON.stringify(mensaje));
+                        log(`📤 ENVIADO: Cita ${id_cit}, campo ${campo} = "${newValue}"`);
+                    });
+                }
+            }
+        });
+        
+        // WebSocket eventos
+        socket.onopen = function() {
+            log('✅ WebSocket conectado');
+        };
+        
+        socket.onmessage = function(event) {
+            const mensaje = JSON.parse(event.data);
+            const miId = parseInt(document.getElementById('miId').value);
+            
+            log(`📨 RECIBIDO: ${JSON.stringify(mensaje)}`);
+            
+            // Ignorar mis propios mensajes
+            if (mensaje.id_ejecutivo === miId) {
+                log('⏭️ Ignorando mi propio mensaje');
+                return;
+            }
+            
+            // Solo procesar actualizaciones de citas
+            if (mensaje.tipo === 'cita_actualizada') {
+                // Buscar fila y actualizar
+                const filas = hot.getData();
+                for (let i = 0; i < filas.length; i++) {
+                    if (filas[i][0] == mensaje.id_cit) {
+                        const col = mensaje.campo === 'nom_cit' ? 1 : 2;
+                        
+                        log(`🔄 Actualizando fila ${i}, columna ${col} con "${mensaje.valor}"`);
+                        
+                        // Actualizar con source 'websocket' (IMPORTANTE)
+                        hot.setDataAtCell(i, col, mensaje.valor, 'websocket');
+                        
+                        // Resaltar visualmente
+                        const celda = hot.getCell(i, col);
+                        if (celda) {
+                            celda.style.backgroundColor = '#ffeb3b';
+                            celda.style.transition = 'background-color 0.3s';
+                            setTimeout(() => {
+                                celda.style.backgroundColor = '';
+                            }, 2000);
+                        }
+                        
+                        break;
+                    }
+                }
+            }
+        };
+        
+        socket.onclose = function() {
+            log('🔴 WebSocket desconectado');
+        };
+        
+        socket.onerror = function(error) {
+            log('❌ Error WebSocket: ' + error);
+        };
+    </script>
+</body>
+</html>
+```
+
+**Prueba**: Abre en 2 pestañas, cambia ID ejecutivo en cada una, edita celdas y ve actualizaciones en tiempo real.
+
+---
+
+## 🔄 **Evitar Bucles Infinitos**
+
+### **Problema:**
+```
+Usuario A cambia → Envía WebSocket → Usuario A recibe → Cambia tabla → Envía otra vez → BUCLE
+```
+
+### **🚨 Ejemplo de Bucle (¿Qué NO hacer?)**
+
+Si en el Ejemplo 2 comentas estas líneas:
+
+```javascript
+// Comentar estas líneas causa BUCLE INFINITO
+// if (mensaje.id_ejecutivo === miId) {
+//     log('⏭️ Ignorando mi propio mensaje');
+//     return;
+// }
+```
+
+**Resultado:** El usuario que edita recibirá su propio mensaje, actualizará la tabla, disparará `afterChange`, enviará otro WebSocket, y así infinitamente.
+
+### **🧪 Prueba de Bucle Infinito**
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test WebSocket BUCLE INFINITO - NO USAR</title>
+    <!-- Handsontable CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.5.0/dist/handsontable.full.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@14.5.0/dist/handsontable.full.min.js"></script>
+</head>
+<body>
+    <h1>⚠️ Test BUCLE INFINITO - Solo para Demostración</h1>
+    <div id="tabla" style="width: 600px; height: 300px;"></div>
+    <p style="color: red;"><strong>ADVERTENCIA:</strong> Este ejemplo genera bucle infinito. Refresca la página para parar.</p>
+    <div id="log" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc; height: 200px; overflow-y: scroll;"></div>
+
+    <script>
+        const socket = new WebSocket('wss://socket.ahjende.com/wss/?encoding=text');
+        
+        function log(mensaje) {
+            const time = new Date().toLocaleTimeString();
+            document.getElementById('log').innerHTML += `<p>[${time}] ${mensaje}</p>`;
+            document.getElementById('log').scrollTop = document.getElementById('log').scrollHeight;
+        }
+        
+        const datos = [
+            [1, 'Juan Pérez', '555-1234'],
+            [2, 'María García', '555-5678']
+        ];
+        
+        const hot = new Handsontable(document.getElementById('tabla'), {
+            data: datos,
+            colHeaders: ['ID Cita', 'Nombre Cliente', 'Teléfono'],
+            columns: [
+                {readOnly: true}, // ID no editable
+                {type: 'text'},   // Nombre
+                {type: 'text'}    // Teléfono
+            ],
+            licenseKey: 'non-commercial-and-evaluation',
+            
+            afterChange: function(changes, source) {
+                log(`📝 afterChange disparado con source: ${source}`);
+                
+                // ❌ SIN VALIDACIÓN DE SOURCE - ESTO CAUSA EL BUCLE
+                // Removemos la validación source !== 'websocket'
+                if (source !== 'loadData') {
+                    changes.forEach(function([row, col, oldValue, newValue]) {
+                        const id_cit = hot.getDataAtCell(row, 0);
+                        const campo = col === 1 ? 'nom_cit' : 'tel_cit';
+                        
+                        const mensaje = {
+                            tipo: 'cita_actualizada',
+                            id_cit: id_cit,
+                            campo: campo,
+                            valor: newValue,
+                            id_ejecutivo: 1
+                        };
+                        
+                        socket.send(JSON.stringify(mensaje));
+                        log(`📤 ENVIADO: ${JSON.stringify(mensaje)}`);
+                    });
+                }
+            }
+        });
+        
+        socket.onopen = function() {
+            log('✅ WebSocket conectado');
+        };
+        
+        socket.onmessage = function(event) {
+            const mensaje = JSON.parse(event.data);
+            log(`📨 RECIBIDO: ${JSON.stringify(mensaje)}`);
+            
+            // ❌ SIN VALIDACIÓN DE USUARIO - Procesamos TODOS los mensajes
+            
+            if (mensaje.tipo === 'cita_actualizada') {
+                const filas = hot.getData();
+                for (let i = 0; i < filas.length; i++) {
+                    if (filas[i][0] == mensaje.id_cit) {
+                        const col = mensaje.campo === 'nom_cit' ? 1 : 2;
+                        
+                        log(`🔄 Actualizando fila ${i}, columna ${col} con "${mensaje.valor}"`);
+                        
+                        // ❌ SIN source 'websocket' - Esto dispara afterChange otra vez
+                        hot.setDataAtCell(i, col, mensaje.valor);
+                        
+                        break;
+                    }
+                }
+            }
+        };
+        
+        socket.onclose = function() {
+            log('🔴 WebSocket desconectado');
+        };
+    </script>
+</body>
+</html>
+```
+
+**¿Qué pasa ahora?** Al editar una celda:
+1. `afterChange` (source='edit') → envía WebSocket
+2. `onmessage` → recibe su propio mensaje  
+3. `setDataAtCell` SIN source → dispara `afterChange` (source='edit') otra vez
+4. **BUCLE INFINITO** 🔄
+
+**Los 2 cambios clave para el bucle:**
+- Quitar `&& source !== 'websocket'` del `afterChange`
+- Quitar el tercer parámetro de `setDataAtCell`
+
+### **Solución 1: Por ID de Ejecutivo**
+```javascript
+// Al enviar
+socket.send(JSON.stringify({
+    id_ejecutivo: miId, // Quién envía
+    // ... otros datos
+}));
+
+// Al recibir
+socket.onmessage = function(event) {
+    const mensaje = JSON.parse(event.data);
+    
+    if (mensaje.id_ejecutivo === miId) {
+        return; // Ignorar mis propios mensajes
+    }
+    
+    // Procesar solo mensajes de otros
+};
+```
+
+### **Solución 2: Source 'websocket'**
+```javascript
+// Al recibir, actualizar con source especial
+hot.setDataAtCell(row, col, valor, 'websocket');
+
+// En afterChange, ignorar cambios de WebSocket
+afterChange: function(changes, source) {
+    if (source !== 'websocket' && source !== 'loadData') {
+        // Solo aquí enviar por WebSocket
+    }
+}
+```
+
+---
+
+## 📋 **Estructura de Mensajes SICAM (Propuestas Básicas)**
+
+### **Actualización de Cita**
+```javascript
+{
+    tipo: 'cita_actualizada',
+    id_cit: 123,
+    campo: 'nom_cit',
+    valor: 'Juan Pérez García',
+    id_ejecutivo: 5
+}
+```
+
+### **Nueva Cita**
+```javascript
+{
+    tipo: 'cita_creada',
+    id_cit: 456,
+    nom_cit: 'María López',
+    tel_cit: '555-1234',
+    id_ejecutivo: 5
+}
+```
+
+### **Cita Eliminada**
+```javascript
+{
+    tipo: 'cita_eliminada',
+    id_cit: 789,
+    nom_cit: 'Cliente Eliminado',
+    id_ejecutivo: 5
+}
+```
+
+> **Nota:** Estas son estructuras **propuestas básicas**. Puedes adaptarlas según las necesidades específicas del módulo.
+
+---
+
+## 🎯 **Integración con Código Existente**
+
+### **En tu `afterChange` actual:**
+```javascript
+// ANTES
+if (changes && source !== 'loadData') {
+    // Tu lógica...
+}
+
+// DESPUÉS
+if (changes && source !== 'loadData' && source !== 'websocket') {
+    // Tu lógica...
+    
+    // + Agregar WebSocket
+    const id_cit = hot.getDataAtCell(row, obtenerIndiceColumna('id_cit'));
+    const campo = obtenerCampo(column);
+    
+    socket.send(JSON.stringify({
+        tipo: 'cita_actualizada',
+        id_cit: id_cit,
+        campo: campo,
+        valor: newValue,
+        id_ejecutivo: idEjecutivoActual
+    }));
+}
+```
+
+---
+
+## ✅ **Ventajas del WebSocket**
+
+1. **Tiempo Real**: Cambios instantáneos sin refrescar
+2. **Colaborativo**: Múltiples usuarios trabajando juntos
+3. **Eficiente**: No polling continuo al servidor
+4. **Visual**: Resaltado automático de cambios externos
+5. **Escalable**: Fácil extender a otros módulos
+
+---
+
+## 🚀 **Próximos Pasos**
+
+1. **Probar** los ejemplos básicos
+2. **Integrar** con tu Handsontable existente
+3. **Extender** a creación y eliminación de citas
+4. **Agregar** filtros por plantel/ejecutivo
+5. **Implementar** en otros módulos (ejecutivos, planteles)
+
+**El servidor WebSocket ya está listo. Solo necesitas conectarte desde JavaScript.** 🎯
+
+---
 
 ## 📌 NOTAS IMPORTANTES
 
