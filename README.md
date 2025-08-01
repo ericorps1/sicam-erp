@@ -5,6 +5,12 @@
 
 ---
 
+## 📖 TEMPLATE DE SESIÓN SICAM
+
+**Ver documentación completa del sistema de sesiones:** [ERP - SICAM Template de Sesión](https://github.com/ericorps1/template_sicam)
+
+---
+
 ## ⚙️ CONTEXTO TÉCNICO
 
 - PHP 5.6  
