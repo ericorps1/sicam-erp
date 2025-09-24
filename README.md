@@ -1266,7 +1266,7 @@ Para el **envío de correos SMTP** también requieres 5 elementos fundamentales:
 
 La función `enviarCorreoTest()` está diseñada para:
 
-- **Probar la configuración SMTP** reutilizando tu template HTML profesional existente
+- **Probar la configuración SMTP** (Servidor de correo electrónicos) reutilizando tu template HTML profesional existente
 - **Recibir la conexión `$db` como parámetro** siguiendo el estándar SICAM (disponible para futuras consultas)
 - **Generar datos aleatorios** manteniendo el diseño y estructura visual de tus correos reales
 - **Usar los mismos colores y estilos** del branding AHJ ENDE
@@ -1277,9 +1277,9 @@ La función `enviarCorreoTest()` está diseñada para:
 // LA FUNCIÓN RECIBE 2 ARGUMENTOS -> CORREO DESTINO Y LA CONEXIÓN DB (POR SI INTERNAMENTE SE REQUIEREN HACER CONSULTAS)
 // ADICIONALMENTE ADOPTA EL CUERPO EN CUANTO A ESTILOS DE LOS OTROS CORREOS QUE YA SE ENVÍAN (INSCRIPCIÓN, TICKETS DE PAGO, CUENTAS DE CONSULTORES, ETC..)
 function enviarCorreoTest($email_destino, $db) {
-	require_once(__DIR__.'/../../vendor/PHPMailer-master/src/PHPMailer.php');
-	require_once(__DIR__.'/../../vendor/PHPMailer-master/src/Exception.php');
-	require_once(__DIR__.'/../../vendor/PHPMailer-master/src/SMTP.php');
+	require_once(__DIR__.'/../vendor/PHPMailer-master/src/PHPMailer.php');
+	require_once(__DIR__.'/../vendor/PHPMailer-master/src/Exception.php');
+	require_once(__DIR__.'/../vendor/PHPMailer-master/src/SMTP.php');
 	
 	$mail = new PHPMailer\PHPMailer\PHPMailer(true);
 	
