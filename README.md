@@ -1241,35 +1241,42 @@ La caché es **amiga del usuario** (páginas más rápidas) pero **enemiga del p
 - **Sin rename = imagen cached antigua, Con rename = imagen nueva**
 
 ---
-📧 SICAM - Envío de Correos
-🔍 Comparativa de Configuración
-Así como para una conexión de base de datos necesitas 5 elementos esenciales:
 
-Host (servidor)
-Puerto (3306 para MySQL)
-Usuario (credencial de acceso)
-Contraseña (autenticación)
-Base de datos (esquema específico)
+# 📧 SICAM - Envío de Correos
 
-Para el envío de correos SMTP también requieres 5 elementos fundamentales:
+## 🔍 Comparativa de Configuración
 
-Host (svgp291.serverneubox.com.mx - servidor de correo)
-Puerto (465 para SSL o 587 para TLS)
-Usuario (contacto@ahjende.com - cuenta de correo)
-Contraseña (AHJ_ENDE_2025 - autenticación SMTP)
-Protocolo (SSL - cifrado de conexión)
+Así como para una **conexión de base de datos** necesitas 5 elementos esenciales:
 
-🔍 Usabilidad de la Función
-La función enviarCorreoTest() está diseñada para:
+- **Host** (servidor)
+- **Puerto** (3306 para MySQL)
+- **Usuario** (credencial de acceso)  
+- **Contraseña** (autenticación)
+- **Base de datos** (esquema específico)
 
-Probar la configuración SMTP reutilizando tu template HTML profesional existente
-Recibir la conexión $db como parámetro siguiendo el estándar SICAM (disponible para futuras consultas)
-Generar datos aleatorios manteniendo el diseño y estructura visual de tus correos reales
-Usar los mismos colores y estilos del branding AHJ ENDE
-Mantener consistencia visual con el resto del sistema
+Para el **envío de correos SMTP** también requieres 5 elementos fundamentales:
 
-Función simplificada con tu template:
-php<?php
+- **Host** (`svgp291.serverneubox.com.mx` - servidor de correo)
+- **Puerto** (`465` para SSL o `587` para TLS)
+- **Usuario** (`contacto@ahjende.com` - cuenta de correo)
+- **Contraseña** (`AHJ_ENDE_2025` - autenticación SMTP)
+- **Protocolo** (`SSL` - cifrado de conexión)
+
+## 🔍 Usabilidad de la Función
+
+La función `enviarCorreoTest()` está diseñada para:
+
+- **Probar la configuración SMTP** reutilizando tu template HTML profesional existente
+- **Recibir la conexión `$db` como parámetro** siguiendo el estándar SICAM (disponible para futuras consultas)
+- **Generar datos aleatorios** manteniendo el diseño y estructura visual de tus correos reales
+- **Usar los mismos colores y estilos** del branding AHJ ENDE
+- **Mantener consistencia** visual con el resto del sistema
+
+### Función simplificada con tu template:
+```php
+<?php
+// LA FUNCIÓN RECIBE 2 ARGUMENTOS -> CORREO DESTINO Y LA CONEXIÓN DB (POR SI INTERNAMENTE SE REQUIEREN HACER CONSULTAS)
+// ADICIONALMENTE ADOPTA EL CUERPO EN CUANTO A ESTILOS DE LOS OTROS CORREOS QUE YA SE ENVÍAN (INSCRIPCIÓN, TICKETS DE PAGO, CUENTAS DE CONSULTORES, ETC..)
 function enviarCorreoTest($email_destino, $db) {
 	require_once(__DIR__.'/../../vendor/PHPMailer-master/src/PHPMailer.php');
 	require_once(__DIR__.'/../../vendor/PHPMailer-master/src/Exception.php');
