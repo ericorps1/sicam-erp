@@ -1241,6 +1241,198 @@ La caché es **amiga del usuario** (páginas más rápidas) pero **enemiga del p
 - **Sin rename = imagen cached antigua, Con rename = imagen nueva**
 
 ---
+📧 SICAM - Envío de Correos
+🔍 Comparativa de Configuración
+Así como para una conexión de base de datos necesitas 5 elementos esenciales:
+
+Host (servidor)
+Puerto (3306 para MySQL)
+Usuario (credencial de acceso)
+Contraseña (autenticación)
+Base de datos (esquema específico)
+
+Para el envío de correos SMTP también requieres 5 elementos fundamentales:
+
+Host (svgp291.serverneubox.com.mx - servidor de correo)
+Puerto (465 para SSL o 587 para TLS)
+Usuario (contacto@ahjende.com - cuenta de correo)
+Contraseña (AHJ_ENDE_2025 - autenticación SMTP)
+Protocolo (SSL - cifrado de conexión)
+
+🔍 Usabilidad de la Función
+La función enviarCorreoTest() está diseñada para:
+
+Probar la configuración SMTP reutilizando tu template HTML profesional existente
+Recibir la conexión $db como parámetro siguiendo el estándar SICAM (disponible para futuras consultas)
+Generar datos aleatorios manteniendo el diseño y estructura visual de tus correos reales
+Usar los mismos colores y estilos del branding AHJ ENDE
+Mantener consistencia visual con el resto del sistema
+
+Función simplificada con tu template:
+php<?php
+function enviarCorreoTest($email_destino, $db) {
+	require_once(__DIR__.'/../../vendor/PHPMailer-master/src/PHPMailer.php');
+	require_once(__DIR__.'/../../vendor/PHPMailer-master/src/Exception.php');
+	require_once(__DIR__.'/../../vendor/PHPMailer-master/src/SMTP.php');
+	
+	$mail = new PHPMailer\PHPMailer\PHPMailer(true);
+	
+	try {
+		// 📧 Configuración SMTP (5 elementos esenciales como en BD)
+		$mail->isSMTP();
+		$mail->Host = 'svgp291.serverneubox.com.mx';  // 1. Host
+		$mail->SMTPAuth = true;
+		$mail->Username = 'contacto@ahjende.com';     // 2. Usuario
+		$mail->Password = 'AHJ_ENDE_2025';            // 3. Contraseña  
+		$mail->SMTPSecure = 'ssl';                    // 4. Protocolo
+		$mail->Port = 465;                            // 5. Puerto
+		$mail->CharSet = 'UTF-8';
+		
+		// 🎲 Datos random para prueba
+		$nombre_random = 'Usuario Test ' . rand(100, 999);
+		$programa_random = 'Programa Demo ' . rand(10, 50);
+		$codigo_random = 'TEST-' . rand(100000, 999999);
+		$fecha_random = date('d de F Y');
+		
+		// Colores del template original
+		$color_principal = '#0588a6';
+		$color_secundario = '#304357';
+		$color_verde = '#4caf50';
+		
+		$mail->setFrom('contacto@ahjende.com', 'AHJ ENDE - Test');
+		$mail->addAddress($email_destino);
+		$mail->Subject = '🚀 TEST SICAM - ' . $programa_random;
+		
+		// 📧 Tu template HTML completo pero con datos de prueba
+		$mail->isHTML(true);
+		$mail->Body = '
+		<!DOCTYPE html>
+		<html lang="es">
+		<head>
+			<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<title>🚀 Test SICAM - ' . htmlspecialchars($programa_random) . '</title>
+			<style>
+				body {
+					font-family: Arial, sans-serif;
+					line-height: 1.6;
+					color: #333333;
+					margin: 0;
+					padding: 0;
+					font-size: 14px;
+					background-color: #ffffff;
+				}
+				.container {
+					max-width: 600px;
+					margin: 0 auto;
+					background-color: #ffffff;
+				}
+				.header {
+					background-color: '.$color_secundario.';
+					padding: 20px;
+					text-align: center;
+				}
+				.header img {
+					max-width: 200px;
+					filter: brightness(0) invert(1);
+				}
+				.content {
+					padding: 20px;
+					background-color: #ffffff;
+				}
+				h1 {
+					color: '.$color_secundario.';
+					margin-top: 0;
+					margin-bottom: 20px;
+					font-size: 20px;
+					font-weight: bold;
+				}
+				.datos {
+					background-color: #ffffff;
+					border-left: 3px solid '.$color_principal.';
+					padding: 15px;
+					margin: 15px 0;
+					border: 1px solid #e5e7eb;
+					border-radius: 4px;
+				}
+				.footer {
+					text-align: center;
+					padding: 15px;
+					background-color: #f8f9fa;
+					font-size: 12px;
+					color: #666;
+				}
+				.lider {
+					font-weight: bold;
+					color: '.$color_verde.';
+				}
+				.payment-confirmation {
+					background-color: #f0f9ff;
+					border: 1px solid '.$color_verde.';
+					border-radius: 4px;
+					padding: 12px;
+					margin: 20px 0;
+					text-align: center;
+				}
+				.highlight {
+					background-color: #e3f2fd;
+					padding: 3px 5px;
+					border-radius: 3px;
+					color: '.$color_secundario.';
+					font-weight: bold;
+				}
+			</style>
+		</head>
+		<body>
+			<div class="container">
+				<div class="header">
+					<img src="https://plataforma.ahjende.com/img/logoLoginEslogan.png" alt="AHJ ENDE">
+				</div>
+				
+				<div class="content">
+					<h1>¡Test Exitoso, LÍDER <span class="lider">' . htmlspecialchars($nombre_random) . '</span>! 🚀</h1>
+					
+					<p>✨ Esta es una prueba del sistema de correos SICAM.</p>
+					
+					<div class="payment-confirmation">
+						<p style="margin: 0; font-weight: bold; font-size: 14px; color: '.$color_verde.';">
+							<span>✅</span> Configuración SMTP funcionando correctamente
+						</p>
+						<p style="margin: 5px 0 0 0; font-size: 12px;">Los correos se envían sin problemas desde el sistema.</p>
+					</div>
+					
+					<div class="datos">
+						<h3 style="font-size: 15px; margin-top: 0; color: '.$color_verde.';">📋 Datos de prueba:</h3>
+						<p><strong>Usuario:</strong> ' . htmlspecialchars($nombre_random) . '</p>
+						<p><strong>Programa:</strong> ' . htmlspecialchars($programa_random) . '</p>
+						<p><strong>Código:</strong> <span class="highlight">' . $codigo_random . '</span></p>
+						<p><strong>Fecha:</strong> ' . $fecha_random . '</p>
+					</div>
+					
+					<p>🔧 <strong style="color: '.$color_verde.';">Sistema SICAM</strong> listo para enviar correos reales.</p>
+				</div>
+				
+				<div class="footer">
+					<p>© ' . date('Y') . ' AHJ ENDE - Todos los derechos reservados</p>
+				</div>
+			</div>
+		</body>
+		</html>
+		';
+		
+		$mail->AltBody = "Test SICAM - $nombre_random\nPrograma: $programa_random\nCódigo: $codigo_random";
+		
+		$mail->send();
+		return true;
+		
+	} catch (Exception $e) {
+		error_log("❌ Error test SICAM: " . $mail->ErrorInfo);
+		return false;
+	}
+}
+?>
+
+---
 
 ## 📌 NOTAS IMPORTANTES
 
