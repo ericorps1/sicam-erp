@@ -1272,7 +1272,6 @@ La función `enviarCorreoTest()` está diseñada para:
 - **Usar los mismos colores y estilos** del branding AHJ ENDE
 - **Mantener consistencia** visual con el resto del sistema
 
-### Función simplificada con tu template:
 ```php
 <?php
 // LA FUNCIÓN RECIBE 2 ARGUMENTOS -> CORREO DESTINO Y LA CONEXIÓN DB (POR SI INTERNAMENTE SE REQUIEREN HACER CONSULTAS)
@@ -1310,7 +1309,7 @@ function enviarCorreoTest($email_destino, $db) {
 		$mail->addAddress($email_destino);
 		$mail->Subject = '🚀 TEST SICAM - ' . $programa_random;
 		
-		// 📧 Tu template HTML completo pero con datos de prueba
+		// 📧 Template HTML completo homologado con header y footer estándar
 		$mail->isHTML(true);
 		$mail->Body = '
 		<!DOCTYPE html>
@@ -1369,6 +1368,10 @@ function enviarCorreoTest($email_destino, $db) {
 					font-size: 12px;
 					color: #666;
 				}
+				.privacidad {
+					margin-top: 10px;
+					font-size: 11px;
+				}
 				.lider {
 					font-weight: bold;
 					color: '.$color_verde.';
@@ -1388,6 +1391,78 @@ function enviarCorreoTest($email_destino, $db) {
 					color: '.$color_secundario.';
 					font-weight: bold;
 				}
+				.website-section {
+					background-color: #ffffff;
+					border: 1px solid '.$color_principal.';
+					padding: 20px;
+					margin: 25px 0;
+					text-align: center;
+					border-radius: 4px;
+				}
+				.website-title {
+					font-size: 16px;
+					font-weight: bold;
+					color: '.$color_verde.';
+					margin: 0 0 15px 0;
+				}
+				.website-link {
+					display: block;
+					color: '.$color_principal.';
+					font-weight: bold;
+					text-decoration: underline;
+					font-size: 16px;
+					margin: 10px 0;
+				}
+				.social-section {
+					margin: 25px 0;
+					text-align: center;
+				}
+				.social-title {
+					font-weight: bold;
+					margin-bottom: 15px;
+				}
+				.social-table {
+					width: 100%;
+					max-width: 320px;
+					margin: 0 auto;
+					border-spacing: 0;
+					border-collapse: separate;
+				}
+				.social-cell {
+					width: 25%;
+					padding: 5px;
+					text-align: center;
+				}
+				.social-link {
+					display: inline-block;
+					width: 40px;
+					height: 40px;
+					line-height: 40px;
+					text-align: center;
+					border-radius: 50%;
+					color: #ffffff !important;
+					font-weight: bold;
+					text-decoration: none;
+					font-size: 18px;
+				}
+				.social-text {
+					display: block;
+					font-size: 10px;
+					margin-top: 5px;
+					color: #666;
+				}
+				.facebook {
+					background-color: #3b5998;
+				}
+				.instagram {
+					background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+				}
+				.tiktok {
+					background-color: #000000;
+				}
+				.youtube {
+					background-color: #ff0000;
+				}
 			</style>
 		</head>
 		<body>
@@ -1397,6 +1472,7 @@ function enviarCorreoTest($email_destino, $db) {
 				</div>
 				
 				<div class="content">
+					// CONTENIDO AQUÍ - Datos random de prueba para verificar funcionamiento
 					<h1>¡Test Exitoso, LÍDER <span class="lider">' . htmlspecialchars($nombre_random) . '</span>! 🚀</h1>
 					
 					<p>✨ Esta es una prueba del sistema de correos SICAM.</p>
@@ -1417,10 +1493,41 @@ function enviarCorreoTest($email_destino, $db) {
 					</div>
 					
 					<p>🔧 <strong style="color: '.$color_verde.';">Sistema SICAM</strong> listo para enviar correos reales.</p>
+					
+					<div class="website-section">
+						<p class="website-title">🌟 Descubre todo lo que AHJ ENDE tiene para ti 🌟</p>
+						<a href="https://ahjende.com" class="website-link">https://ahjende.com</a>
+						<p style="margin-top: 5px; font-size: 12px;">Da clic en el enlace para conocer nuestros programas y beneficios</p>
+					</div>
+				</div>
+				
+				<div class="social-section">
+					<p class="social-title">✓ Síguenos en nuestras redes oficiales:</p>
+					<table class="social-table">
+						<tr>
+							<td class="social-cell">
+								<a href="https://www.facebook.com/escueladenegociosydesarrolloempresarial" class="social-link facebook">f</a>
+								<span class="social-text">Facebook</span>
+							</td>
+							<td class="social-cell">
+								<a href="https://www.instagram.com/ahjendeoficial/" class="social-link instagram">i</a>
+								<span class="social-text">Instagram</span>
+							</td>
+							<td class="social-cell">
+								<a href="https://www.tiktok.com/@ahj.endeoficial" class="social-link tiktok">t</a>
+								<span class="social-text">TikTok</span>
+							</td>
+							<td class="social-cell">
+								<a href="https://www.youtube.com/@ahj-endeescueladenegocios4351" class="social-link youtube">y</a>
+								<span class="social-text">YouTube</span>
+							</td>
+						</tr>
+					</table>
 				</div>
 				
 				<div class="footer">
 					<p>© ' . date('Y') . ' AHJ ENDE - Todos los derechos reservados</p>
+					<p class="privacidad">Revisa nuestro <a href="https://ahjende.com/aviso-de-privacidad" style="color: '.$color_principal.';">Aviso de Privacidad</a></p>
 				</div>
 			</div>
 		</body>
@@ -1438,7 +1545,7 @@ function enviarCorreoTest($email_destino, $db) {
 	}
 }
 ?>
-
+```
 ---
 
 ## 📌 NOTAS IMPORTANTES
@@ -1455,3 +1562,4 @@ function enviarCorreoTest($email_destino, $db) {
 ---
 
 > *"Por cada paso de éxito, subir 2 de humildad"* - **ericorps**
+```
